@@ -8,8 +8,24 @@ import os
 
 load_dotenv()
 
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+
+app = FastAPI()
+# Allow your frontend origin
+origins = [
+    "http://localhost:5174",   # your React app
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,          # Allowed origins
+    allow_credentials=True,
+    allow_methods=["*"],            # Allow all HTTP methods
+    allow_headers=["*"],            # Allow all headers
+)
 
 # MongoDB Client Setup
 MONGO_URI = os.getenv("MONGO_UR")  # Get Mongo URI from environment
