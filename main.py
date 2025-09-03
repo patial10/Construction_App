@@ -17,6 +17,9 @@ app = FastAPI()
 # Allow your frontend origin
 origins = [
     "http://localhost:5174",   # your React app
+    "http://localhost:5172", 
+    "http://localhost:5173",
+    "http://localhost:5175", 
 ]
 
 app.add_middleware(
@@ -97,6 +100,19 @@ async def book_order(customer_id: str, order: Order):
 async def get_customers():
     customers = await customers_collection.find().to_list(100)
     return [customer_helper(cust) for cust in customers]
+
+# Route to View Customer by ID
+@app.get("/customers/{customer_id}", response_model=CustomerInDB)
+async def get_customer_by_id(customer_id: str):
+    if not ObjectId.is_valid(customer_id):
+        raise HTTPException(status_code=400, detail="Invalid customer ID format")
+
+    customer = await customers_collection.find_one({"_id": ObjectId(customer_id)})
+
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    return customer_helper(customer)
 
 # Route to Edit Customer Order (for admin)
 @app.put("/customers/{customer_id}/order/{order_index}")
